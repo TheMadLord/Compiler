@@ -1,7 +1,11 @@
+import {Termenial} from "./Termenial"
+
 export class Grammar{
+	termenials: Termenial[];
+
 	constructor(specification: string){
-		let specList = [];
 		let lines = specification.split("\n");
+		this.termenials = [];
 		for(let l of lines){		
 			//split line on arrow
 			l = l.trim();
@@ -14,24 +18,24 @@ export class Grammar{
 			}
 
 			//check for repeat RHS
-			let termenial = tokens[0].trim();			
-			for(let t of specList){
-				if(t[0] === termenial){
+			let name = tokens[0].trim();			
+			for(let t of this.termenials){
+				if(t.name === name){
 					throw new Error("Repeated termenial");
 				}
 			}
 
 			//check for regex correctness
-			let regEx;
+			let regEx: RegExp;
 			try{
-				regEx = new RegExp(tokens[1].trim());
+				regEx = new RegExp(tokens[1].trim(),"gy");
 			}catch(e){
 				throw new Error("Invalid Regex: " + tokens[1]);
 			}
 
-			//add pair to the known list
-			specList.push([termenial,regEx]);
-		
+			//add the termenial to list
+			this.termenials.push(new Termenial(name, regEx));
 		}
+		this.termenials.push(new Termenial("WHITESPACE", /\s+/gy));
 	}
 }
