@@ -7,7 +7,4 @@ export class Termenial extends Symbol{
 		super(name);
 		this.regex = regex;
 	}
-    	
-	toString(){
-    	}
 }

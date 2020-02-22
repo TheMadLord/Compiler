@@ -5,6 +5,7 @@ var Symbol = /** @class */ (function () {
         this.name = name;
     }
     Symbol.prototype.toString = function () {
+        return this.name;
     };
     return Symbol;
 }());

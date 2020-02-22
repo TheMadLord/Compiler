@@ -21,8 +21,6 @@ var Termenial = /** @class */ (function (_super) {
         _this.regex = regex;
         return _this;
     }
-    Termenial.prototype.toString = function () {
-    };
     return Termenial;
 }(Symbol_1.Symbol));
 exports.Termenial = Termenial;
