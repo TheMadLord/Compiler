@@ -6,6 +6,8 @@ export class Grammar{
 	termenials: Termenial[];
 	nontermenials: Nontermenial[];
 
+	EOL: Symbol;
+
 	constructor(specification: string){
 		let lines = specification.split("\n");
 		this.termenials = [];
@@ -42,7 +44,7 @@ export class Grammar{
 		}
 		//add defualt whitespace termenial
 		this.termenials.push(new Termenial("WHITESPACE", /\s+/gy));
-		
+		this.EOL = new Termenial("$", /$/);
 		//pasrse nonterminals
 		this.nontermenials = [];
 		let preProds:any[] = [];
@@ -116,7 +118,13 @@ export class Grammar{
 		}
 		//minus 1 here becuase WHITESPACE symbol is never reachable
 		if(reachable.size != symbols.length-1){
-			throw new Error("Langauge includes unreachable symbols");
+			let unreachable: string = "";
+			for(let sym of symbols){
+				if(!reachable.has(sym)){
+				 	unreachable += " " + sym.name		
+				}		
+			}
+			throw new Error("Langauge includes unreachable symbols" + unreachable);
 		}	
 	}
 }

@@ -1,0 +1,12 @@
+NUM -> \d+
+ID -> [A-Za-z_]\w* 
+ADDOP -> [+-]
+POWOP -> \*\*
+MULOP -> [*/]
+LP -> [(]
+RP -> [)]
+BITNOT -> ~
+COMMA -> ,
+
+start -> NUM | ADDOP | MULOP | POWOP | LP | RP | ID | BITNOT | COMMA
+
