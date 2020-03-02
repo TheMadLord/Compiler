@@ -1,12 +1,27 @@
-NUM -> \d+
-ID -> [A-Za-z_]\w* 
-ADDOP -> [+-]
-POWOP -> \*\*
-MULOP -> [*/]
+SEMI -> ;
+LBR -> [{]
+RBR -> [}]
 LP -> [(]
 RP -> [)]
-BITNOT -> ~
-COMMA -> ,
+EQ -> =
+CMA -> ,
+IF -> \bif\b
+WHILE -> \bwhile\b
+ELSE -> \belse\b
+TYPE -> \b(int|double)\b
+NUM -> \d+
+ID -> [A-Za-z_]+
 
-start -> NUM | ADDOP | MULOP | POWOP | LP | RP | ID | BITNOT | COMMA
-
+S -> stmt-list
+stmt-list -> stmt stmt-list | LAMBDA	
+stmt -> loop | cond | assign SEMI | func-call SEMI | LBR stmt-list RBR | var-decl SEMI
+loop -> WHILE LP expr RP stmt
+cond -> IF LP expr RP stmt | IF LP expr RP stmt ELSE stmt
+assign -> ID EQ expr
+expr -> NUM | ID
+func-call -> ID LP param-list RP
+param-list -> LAMBDA | expr | expr CMA param-list’
+param-list’ -> expr CMA param-list’ | expr
+var-decl -> TYPE var-list
+var-list -> ID | ID CMA var-list
+	

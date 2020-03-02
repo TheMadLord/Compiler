@@ -84,6 +84,9 @@ export class Grammar{
 				let production:Symbol[] = []
 				for(let sym of p.split(" ")){
 					if(sym.length === 0){continue;}
+					if(sym === "LAMBDA"){
+						continue;
+					}
 					let found: boolean = false;
 					for(let s of symbols){
 						if(s.name === sym){

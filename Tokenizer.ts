@@ -49,8 +49,14 @@ export class Tokenizer{
 		}
 		this.parsed.push(new Token(this.gram.EOL,"$",this.line))
 	}
+
 	peek():Token{
 		return this.parsed[this.index+1];
+	}
+
+
+	peek2():Token{
+		return this.parsed[this.index+2];
 	}
 
 	next():Token{
@@ -58,6 +64,15 @@ export class Tokenizer{
 		return this.parsed[this.index];
 	}
 	
+	expect(sym:string):Token{
+		let ret:Token = this.next();
+		if(ret.sym != sym){
+			throw new Error("Unexpected token " + ret + " expected " + sym);
+		}
+		return ret;
+	}
+
+
 	hasMore(){
 		return this.index < this.parsed.length-2;
 	}

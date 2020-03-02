@@ -96,7 +96,7 @@ export function parse(input:string){
 
 function printTree(tn: treeNode, tab:string){
 	if(tn != undefined){
-		console.log(tab + "{"+tn.sym +", "+ tn.token.lexeme+"}");
+		console.log(tab + "{"+tn.sym+"}");
 		for(let c of tn.children){
 			printTree(c, tab+"\t");
 		}

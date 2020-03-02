@@ -1,0 +1,22 @@
+digraph d {
+node [shape=rectangle];
+n0 [label="S"];
+n1 [label="stmt-list"];
+n2 [label="stmt"];
+n3 [label="assign"];
+n4 [label="ID\nx"];
+n5 [label="EQ\n="];
+n6 [label="expr"];
+n7 [label="NUM\n42"];
+n8 [label="SEMI\n;"];
+n9 [label="stmt-list"];
+n0 -> n1;
+n1 -> n2;
+n1 -> n9;
+n2 -> n3;
+n2 -> n8;
+n3 -> n4;
+n3 -> n5;
+n3 -> n6;
+n6 -> n7;
+}
