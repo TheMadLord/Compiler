@@ -13,6 +13,7 @@ export class Grammar{
 		this.termenials = [];
 		let i = 0; 
 		let WS:Termenial;
+		//console.log(specification);
 		for(i; i < lines.length; i++){		
 			//split line on arrow
 			let l:string = lines[i].trim();
@@ -127,6 +128,8 @@ export class Grammar{
 		}
 		//Compute Nullable
 		this.computeNullable();
+		this.computeFirst();
+		this.computeFollow();
 	}
 
 	computeNullable(){
@@ -179,6 +182,67 @@ export class Grammar{
 		return reachable;
 	}
 
+	computeFirst(){
+		let changed = true;
+		while(changed){
+			changed = false;
+			for(let sym of this.nontermenials){
+				for(let p of sym.productions){
+					for(let s of p){
+						changed = sym.addToFirst(s.first) || changed;
+						if(!s.isNullable()){
+							break;
+						}
+					}				
+				}
+			}
+		}
+	}
+
+
+	computeFollow(){
+		this.nontermenials[0].addToFollowS(this.EOL)
+		let changed = true;
+		while(changed){
+			changed = false;
+			for(let nt of this.nontermenials){
+				for(let p of nt.productions){
+					for(let i:number = 0; i < p.length; i++){
+						if(p[i] instanceof Nontermenial){
+							let sym:Nontermenial = <Nontermenial>p[i];
+							let exited = false;
+							for(let j:number = i + 1; j < p.length && !exited; j++){
+								changed = sym.addToFollow(p[j].first) || changed
+								if(!p[j].isNullable()){
+									exited = true;
+								}
+							}
+							if(!exited){
+								changed = sym.addToFollow(nt.follow) || changed
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	getFirst():Map<string, Set<string>>{
+		let ret:Map<string, Set<string>> =  new Map();
+		let symbols: Symbol[] = (<Symbol[]>this.nontermenials).concat(this.termenials)
+		for(let sym of symbols){
+			if("WHITESPACE" === sym.name){
+				continue;
+			}
+			let f: Set<string> = new Set();
+			for(let s of sym.first){
+				f.add(s.name);
+			}
+			ret.set(sym.name, f);
+		}
+		return ret;
+	}
+	
 	getNullable():Set<string>{
 		let symbols: Symbol[] = (<Symbol[]>this.nontermenials).concat(this.termenials)
 		let ret: Set<string> =  new Set();
@@ -188,6 +252,18 @@ export class Grammar{
 			}
 		}
 		return ret;	
+	}
+
+	getFollow():Map<string, Set<string>>{
+		let ret:Map<string, Set<string>> =  new Map();
+		for(let sym of this.nontermenials){
+			let f: Set<string> = new Set();
+			for(let s of sym.follow){
+				f.add(s.name);
+			}
+			ret.set(sym.name, f);
+		}
+		return ret;
 	}
 }
 

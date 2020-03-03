@@ -6,5 +6,6 @@ export class Termenial extends Symbol{
 	constructor(name: string, regex:RegExp){
 		super(name);
 		this.regex = regex;
+		this.first.add(this);	
 	}
 }
