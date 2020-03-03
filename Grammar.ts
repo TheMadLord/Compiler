@@ -12,6 +12,7 @@ export class Grammar{
 		let lines = specification.split("\n");
 		this.termenials = [];
 		let i = 0; 
+		let WS:Termenial;
 		for(i; i < lines.length; i++){		
 			//split line on arrow
 			let l:string = lines[i].trim();
@@ -40,15 +41,25 @@ export class Grammar{
 			}
 
 			//add the termenial to list
-			this.termenials.push(new Termenial(name, regEx));
+			let newTerm = new Termenial(name, regEx);
+			if(name === "WHITESPACE"){
+				WS = newTerm
+			}
+			this.termenials.push(newTerm);
 		}
-		//add defualt whitespace termenial
-		this.termenials.push(new Termenial("WHITESPACE", /\s+/gy));
+		//add defualt whitespace termenial if None was found
+		if(!WS){
+			WS = new Termenial("WHITESPACE", /\s+/gy)
+			this.termenials.push(WS);
+		}
 		this.EOL = new Termenial("$", /$/);
+		while(lines[i].length === 0){
+			i++
+		};
+				
 		//pasrse nonterminals
 		this.nontermenials = [];
 		let preProds:any[] = [];
-		i++;
 		for(i; i < lines.length; i++){
 			//split line on arrow
 			let l:string = lines[i].trim();
@@ -84,7 +95,8 @@ export class Grammar{
 				let production:Symbol[] = []
 				for(let sym of p.split(" ")){
 					if(sym.length === 0){continue;}
-					if(sym === "LAMBDA"){
+					if(sym === "lambda"){
+						prodGroup[0].nullable  = true;
 						continue;
 					}
 					let found: boolean = false;
@@ -103,8 +115,53 @@ export class Grammar{
 			} 
 		}
 		//check for contectedness
+		let reachable:Set<Symbol> = this.computeReachable(); 
+		if(reachable.size != symbols.length){
+			let unreachable: string = "";
+			for(let sym of symbols){
+				if(!reachable.has(sym)){
+				 	unreachable += " " + sym.name		
+				}		
+			}
+			throw new Error("Langauge includes unreachable symbols" + unreachable);
+		}
+		//Compute Nullable
+		this.computeNullable();
+	}
+
+	computeNullable(){
+		let changed = true;
+		while(changed){
+			changed = false;
+			for(let sym of this.nontermenials){
+				if(sym.isNullable()){
+					continue;
+				}
+				for(let p of sym.productions){
+					let pNull = true
+					for(let s of p){
+						if(!s.isNullable()){
+							pNull = false;
+							break;
+						}
+					}
+					if(pNull){
+						changed = sym.setNullable(true) || changed
+						continue;
+					}				
+				}
+			}
+		}
+	}
+
+	computeReachable():Set<Symbol>{
 		let reachable:Set<Symbol> = new Set();
 		reachable.add(this.nontermenials[0]);
+		for(let t of this.termenials){
+			if(t.name === "WHITESPACE" || t.name === "COMMENT"){
+				reachable.add(t);
+			}
+		}
 		while(true){
 			let i = reachable.size;
 			reachable.forEach((r)=>{
@@ -119,15 +176,19 @@ export class Grammar{
 			});
 			if(i === reachable.size){break;}
 		}
-		//minus 1 here becuase WHITESPACE symbol is never reachable
-		if(reachable.size != symbols.length-1){
-			let unreachable: string = "";
-			for(let sym of symbols){
-				if(!reachable.has(sym)){
-				 	unreachable += " " + sym.name		
-				}		
+		return reachable;
+	}
+
+	getNullable():Set<string>{
+		let symbols: Symbol[] = (<Symbol[]>this.nontermenials).concat(this.termenials)
+		let ret: Set<string> =  new Set();
+		for(let sym of symbols){
+			if(sym.isNullable()){
+				ret.add(sym.name);
 			}
-			throw new Error("Langauge includes unreachable symbols" + unreachable);
-		}	
+		}
+		return ret;	
 	}
 }
+
+

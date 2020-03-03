@@ -9,4 +9,8 @@ export class Symbol {
 	toString(){
 		return this.name;	
     	}
+	
+	isNullable():boolean{
+		return false;
+	}
 }

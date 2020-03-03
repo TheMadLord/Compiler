@@ -1,9 +1,0 @@
-int x;
-double y;
-int x y z;
-if( x ) {
-	foo();
-	bar();
-	baz();
-}
-

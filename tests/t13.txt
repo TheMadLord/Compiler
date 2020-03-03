@@ -1,5 +1,0 @@
-if( x ) 
-    if ( y )
-        x = y;
-    else 
-        x = z;

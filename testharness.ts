@@ -1,81 +1,54 @@
 
 declare var require:any;
 let fs = require("fs");
-import {parse} from "./Parser";
+import {Grammar} from "./Grammar";
 
 function main(){
-    let ok = testWithFile("tests.txt",false);
-    if(ok)
-        console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-Basic tests OK [+100]-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-    else
-        return;
-        
-    ok = testWithFile("tests.txt",true);
-    if(ok)
-        console.log("-=-=-=-=-=-=-=-=-=-=-Bonus tests OK [+25]-=-=-=-=-=-=-=-=-=-=-");
-    else
-        return;
-        
-}
-        
-function testWithFile(fname:string, doBonus: boolean ): boolean{
-    let data:string = fs.readFileSync(fname,"utf8");
+    let data:string = fs.readFileSync("tests.txt","utf8");
     let tests: any = JSON.parse(data);
-    let numTests=0;
+    let numPassed=0;
+    let numFailed=0;
     
     for(let i=0;i<tests.length;++i){
         
         let name: string = tests[i]["name"];
-        let expected: any = tests[i]["tree"];
-        let bonus: boolean = tests[i]["bonus"];
+        let expected: any = tests[i]["nullable"];
         let input: string = tests[i]["input"];
-        
-        if( bonus !== doBonus )
-            continue;
 
-        let actual: any;
-        
-        try{
-            actual = parse(input);
-        } catch(e){
-            actual = undefined;
-        }
-        if( !treesAreSame( actual, expected ) ){
-            console.log("Test "+name+" failed: Tree mismatch");
-            return false;
+        let G = new Grammar(input);
+        let nullable : any = G.getNullable();
+        if( !setsAreSame( nullable, expected ) ){
+            console.log("Test "+name+" failed");	
+            ++numFailed;
         } 
-            
-        ++numTests;
-
+        else
+            ++numPassed;
     }
-    console.log(numTests+" tests OK");
-    return true;
+    console.log(numPassed+" tests OK"+"      "+numFailed+" tests failed" );
+    return numFailed==0;
 }
 
-function treesAreSame( n1: any, n2:any ){
-    if( n1 === undefined && n2 === undefined )
-        return true;
-        
-    if( n1 === undefined && n2 !== undefined ){
+function setsAreSame( s1: any, s2: any ){
+    let L1 : string[] = [];
+    let L2 : string[] = [];
+    
+    s1.forEach( (x:string) => {
+        L1.push(x);
+    });
+    s2.forEach( (x:string) => {
+        L2.push(x);
+    });
+    L1.sort();
+    L2.sort();
+    if( L1.length !== L2.length )
         return false;
-    }
-    if( n2 === undefined && n1 !== undefined ){
-        return false;
-    }
-    if( n1["sym"] != n2["sym"] ){
-        return false;
-    }
-    if( n1["children"].length != n2["children"].length ){
-        return false;
-    }
-    for(let i=0;i<n1["children"].length;++i){
-        if(!treesAreSame( n1["children"][i], n2["children"][i] ) )
+    for(let i=0;i<L1.length;++i){
+        if( L1[i] !== L2[i] )
             return false;
     }
     return true;
 }
-    
-    
+ 
     
 
 
