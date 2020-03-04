@@ -116,16 +116,16 @@ export class Grammar{
 			} 
 		}
 		//check for contectedness
-		let reachable:Set<Symbol> = this.computeReachable(); 
-		if(reachable.size != symbols.length){
-			let unreachable: string = "";
-			for(let sym of symbols){
-				if(!reachable.has(sym)){
-				 	unreachable += " " + sym.name		
-				}		
-			}
-			throw new Error("Langauge includes unreachable symbols" + unreachable);
-		}
+		//let reachable:Set<Symbol> = this.computeReachable(); 
+		//if(reachable.size != symbols.length){
+		//	let unreachable: string = "";
+		//	for(let sym of symbols){
+		//		if(!reachable.has(sym)){
+		//		 	unreachable += " " + sym.name		
+		//		}		
+		//	}
+		//	throw new Error("Langauge includes unreachable symbols" + unreachable);
+		//}
 		//Compute Nullable
 		this.computeNullable();
 		this.computeFirst();
